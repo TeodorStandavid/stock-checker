@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stock-checker
+  labels:
+    app: stock-checker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stock-checker
+  template:
+    metadata:
+      labels:
+        app: stock-checker
+    spec:
+      containers:
+        - name: stock-checker
+          image: teodorstandavid/stock-checker:latest
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 8080
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: stock-checker-secret
+                  key: apikey
+            - name: SYMBOL
+              valueFrom:
+                configMapKeyRef:
+                  name: stock-ckecker
+                  key: symbol
+            - name: NDAYS
+              valueFrom:
+                configMapKeyRef:
+                  name: stock-ckecker
+                  key: ndays
+            - name: GIN_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: stock-ckecker
+                  key: gin_mode
+          resources:
+            requests:
+              memory: "10Mi"
+              cpu: "100m"
+            limits:
+              memory: "20Mi"
+              cpu: "250m"
